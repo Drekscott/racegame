@@ -46,12 +46,13 @@ def crash():
     message_display('You Crashed')
     
 def game_loop():
-    x=(display_width * 0.45)
+    x=(display_width * 0.25)
     y=(display_height * .6)
     x_change = 0
     
-    block_startx = random.randrange(0, display_width)
-    block_starty = -600
+    block_startx = random.randrange(0, display_width) 
+    #block_startx = (display_width/2) 
+    block_starty = -500
     blocks_speed = 7
     block_width = 100
     block_height = 100
@@ -92,12 +93,14 @@ def game_loop():
             block_starty = 0 - block_height
             block_startx = random.randrange(0, display_width)
             
-        if y < block_starty+block_height:
-            print('y crossover')
-
-        if x > block_startx and x < block_startx + block_width or x+car_width > block_startx and x + car_width < block_startx+block_width:
+        if x < block_startx + block_width and x+car_width > block_startx:
             print('x crossover')
-            crash()
+            
+            if y <= block_starty+block_height:
+                print('y crossover')
+                crash()
+        
+            
         
         pygame.display.update()
         clock.tick(30)
