@@ -20,6 +20,11 @@ clock = pygame.time.Clock()
 car_img=pygame.image.load('racecar.png')
 car_width = 255
 
+def blocks_dodged(count):
+    font = pygame.font.SysFont(None, 25)
+    text = font.render('Dodged:' +str(count), True, black)
+    gameDisplay.blit(text,(0,0))
+
 def blocks(blockx, blocky, blockh, blockw, color):
     pygame.draw.rect(gameDisplay, color, [blockx, blocky, blockw, blockh])
 
@@ -49,13 +54,16 @@ def game_loop():
     x=(display_width * 0.25)
     y=(display_height * .6)
     x_change = 0
+    y_change = 0
     
     block_startx = random.randrange(0, display_width) 
     #block_startx = (display_width/2) 
     block_starty = -500
-    blocks_speed = 7
+    blocks_speed = 4
     block_width = 100
     block_height = 100
+    
+    dodged = 0
     
     gameExit = False
 
@@ -71,20 +79,25 @@ def game_loop():
                     x_change = -5
                 elif event.key == pygame.K_RIGHT:
                     x_change = 5
+                elif event.key == pygame.K_UP:
+                    y_change = -5
+                elif event.key == pygame.K_DOWN:
+                    y_change = 5
                 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                     x_change = 0
                     
         x += x_change
+        y += y_change
         
         gameDisplay.fill(green)       
         
         #blocks(blockx, blocky, blockh, blockw, color)
         blocks(block_startx, block_starty, block_width, block_height, black)
         block_starty += blocks_speed
-        
         car(x,y)
+        blocks_dodged(dodged)
         
         if x > display_width - car_width or x<0:
             crash()
@@ -92,6 +105,8 @@ def game_loop():
         if block_starty > display_height:
             block_starty = 0 - block_height
             block_startx = random.randrange(0, display_width)
+            dodged+=1
+            blocks_speed+=1
             
         if x < block_startx + block_width and x+car_width > block_startx:
             print('x crossover')
