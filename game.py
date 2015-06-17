@@ -1,4 +1,6 @@
 import pygame, os
+import time
+import random
 
 pygame.init()
 
@@ -18,21 +20,50 @@ clock = pygame.time.Clock()
 car_img=pygame.image.load('racecar.png')
 car_width = 255
 
+def blocks(blockx, blocky, blockh, blockw, color):
+    pygame.draw.rect(gameDisplay, color, [blockx, blocky, blockw, blockh])
+
 def car(x,y):
     gameDisplay.blit(car_img, (x,y))
+
+def text_objects(text, font):
+    textSurface = font.render(text, True, red)
+    return textSurface, textSurface.get_rect()
+
+def message_display(text):
+    largeText = pygame.font.Font('freesansbold.ttf', 115)
+    TextSurf, TextRect = text_objects(text, largeText)
+    TextRect.center = ((display_width/2), (display_height/2))
+    gameDisplay.blit(TextSurf, TextRect)
+    
+    pygame.display.update()
+    
+    time.sleep(2)
+    
+    game_loop()
+    
+def crash():
+    message_display('You Crashed')
     
 def game_loop():
     x=(display_width * 0.45)
     y=(display_height * .6)
     x_change = 0
-
+    
+    block_startx = random.randrange(0, display_width)
+    block_starty = -600
+    blocks_speed = 7
+    block_width = 100
+    block_height = 100
+    
     gameExit = False
 
     while not gameExit:
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                gameExit = True
+                pygame.quit()
+                quit()
                 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
@@ -47,14 +78,29 @@ def game_loop():
         x += x_change
         
         gameDisplay.fill(green)       
+        
+        #blocks(blockx, blocky, blockh, blockw, color)
+        blocks(block_startx, block_starty, block_width, block_height, black)
+        block_starty += blocks_speed
+        
         car(x,y)
         
         if x > display_width - car_width or x<0:
-            gameExit = True
+            crash()
+        
+        if block_starty > display_height:
+            block_starty = 0 - block_height
+            block_startx = random.randrange(0, display_width)
             
+        if y < block_starty+block_height:
+            print('y crossover')
+
+        if x > block_startx and x < block_startx + block_width or x+car_width > block_startx and x + car_width < block_startx+block_width:
+            print('x crossover')
+            crash()
         
         pygame.display.update()
-        clock.tick(60)
+        clock.tick(30)
         
 game_loop()        
 pygame.quit()
